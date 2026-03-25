@@ -12,40 +12,55 @@
 
 # PROGRAM :
 ~~~
-clear;
+ 
+ clc;
 close;
 
-N = 51;                      
-fc = 0.4;                    
-n = 0:N-1;
-alpha = (N-1)/2;
+M = input('Enter the Odd Filter Length = ');
+Wc = input('Enter the Digital Cut off frequency = ');
 
-// Ideal High Pass Filter Impulse Response
-hd = -sin(2*%pi*fc*(n - alpha)) ./ (n - alpha);
-hd(alpha+1) = 1 - 2*fc;      
+alpha = (M-1)/2;
 
-w = 0.54 - 0.46*cos(2*%pi*n/(N-1));
-h = hd .* w;
-// Plot Impulse Response
-subplot(2,1,1);
-plot(n, h, 'r');
-xlabel('n');
-ylabel('h(n)');
-title('Impulse Response of FIR High Pass Filter using Hamming Window');
-grid on;
+for n = 1:M
+    if (n == alpha+1) then
+        hd(n) = 1 - (Wc/%pi);
+    else
+        hd(n) = -sin(Wc*((n-1)-alpha))/(((n-1)-alpha)*%pi);
+    end
+end
 
-[H, f] = frmag(h, 512);     
-subplot(2,1,2);
-plot(f, abs(H));
-xlabel('Normalized Frequency');
-ylabel('|H(f)|');
-title('Magnitude Response of FIR High Pass Filter');
-grid on;
+// Hamming Window
+for n = 1:M
+    W(n) = 0.54 - 0.46*cos((2*%pi*(n-1))/(M-1));
+end
+
+h = hd .* W;
+
+disp("Filter Coefficients:");
+disp(h);
+
+[hzm,fr] = frmag(h,256);
+
+subplot(2,1,1)
+plot(2*fr,hzm)
+xlabel('Normalized Digital Frequency w');
+ylabel('Magnitude');
+title('Frequency Response of FIR HPF using Hamming Window');
+
+hzm_dB = 20*log10(hzm);
+
+subplot(2,1,2)
+plot(2*fr,hzm_dB)
+xlabel('Normalized Digital Frequency w');
+ylabel('Magnitude in dB');
+title('Frequency Response of FIR HPF using Hamming Window');
+
 ~~~
 
 
 # OUTPUT :
-<img width="926" height="573" alt="image" src="https://github.com/user-attachments/assets/4d5a286d-f98e-427e-9296-724fab590315" />
+ <img width="405" height="433" alt="image" src="https://github.com/user-attachments/assets/97096daa-cca7-4fa6-9fa6-de423e55dd41" />
+
 
 
 # RESULT :
